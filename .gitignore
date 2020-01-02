@@ -2,5 +2,5 @@ __pycache__
 .DS_Store
 *.json
 *.nc
-_requirements.txt
 *.zip
+_*
