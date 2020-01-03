@@ -1,4 +1,17 @@
 # parcels-api
+To run this in a local python virtual environment run these commands
+```
+python -m virtualenv parcels-env
+source parcels-env/bin/activate
+pip install -r requirements.txt
+python server.py
+```
+
+If that all works you should be able to enter this url (for example) and get the json response you saw before
+
+```
+http://0.0.0.0:5000/trajectory?lat=28.7&lon=-88.3&t0=0
+
 
 ```
 docker build -t base .
