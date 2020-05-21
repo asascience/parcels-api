@@ -1,7 +1,7 @@
 # parcels-api
 To run this in a local python virtual environment run these commands
 ```
-python -m venv parcels-env
+python3 -m venv parcels-env
 source parcels-env/bin/activate
 pip install -r requirements.txt
 python server.py
