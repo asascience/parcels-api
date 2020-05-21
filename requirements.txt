@@ -14,9 +14,10 @@ netCDF4==1.5.3
 numpy==1.18.0
 packaging==19.2
 pandas==0.25.3
--e git+https://github.com/kennethells/parcels.git@28ccae6cd6703dfa7aefefadc49bab7027fe0628#egg=parcels
+parcels==2.2.1.dev11+g9949fcee
 pluggy==0.13.1
 progressbar==2.5
+psutil==5.7.0
 py==1.8.0
 pydantic==1.3
 pymbolic==2019.2
