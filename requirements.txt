@@ -14,8 +14,7 @@ netCDF4==1.5.3
 numpy==1.18.0
 packaging==19.2
 pandas==0.25.3
-parcels==2.2.1.dev11+g9949fcee
-pluggy==0.13.1
+git+https://github.com/OceanParcels/parcels.git@master
 progressbar==2.5
 psutil==5.7.0
 py==1.8.0

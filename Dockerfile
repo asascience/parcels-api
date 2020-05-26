@@ -63,4 +63,6 @@ VOLUME /data
 
 EXPOSE 5000
 
+COPY md3/HYCOM* /data/
+
 CMD python3.7 server.py
