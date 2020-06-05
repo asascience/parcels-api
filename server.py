@@ -18,7 +18,7 @@ app = fastapi.FastAPI()
 
 origins = [
     "http://localhost:5000",
-    "http://localhost:80",
+    "http://localhost:8080",
     "localhost/:180",
 ]
 
