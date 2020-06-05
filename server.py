@@ -3,6 +3,10 @@
 
 import datetime
 import fastapi
+
+# from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
+
 import logging
 import os
 import starlette.responses
@@ -11,6 +15,20 @@ from util import parcels_to_geojson
 
 # FastAPI server
 app = fastapi.FastAPI()
+
+origins = [
+    "http://localhost:5000",
+    "http://localhost:80",
+    "localhost/:180",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # logger
 logger = logging.getLogger('server')
