@@ -11,7 +11,7 @@ from parcels import FieldSet, ParticleSet, JITParticle, AdvectionRK4
 
 def parcels_to_geojson(lat, lon, t0='2010_0420'):
 
-    data = 'data/*'
+    data = '/data/*'
     files = os.listdir('/data')
     fname = 'parcels_out'
 
