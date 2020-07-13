@@ -6,3 +6,8 @@ __pycache__
 *~
 _*
 parcels-env/
+test_data/
+*.swp
+.ipynb_checkpoints/
+out-*
+*ipynb

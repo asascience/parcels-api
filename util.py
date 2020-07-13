@@ -2,18 +2,56 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import numpy as np
 import xarray as xr
+from zeep import Client
 
 from parcels import FieldSet, ParticleSet, JITParticle, AdvectionRK4
 
+
+class EDS:
+    
+    def __init__(self, start_date, end_date, x1, y1, x2, y2):
+        self.start = start_date
+        self.end = end_date
+        self.x1 = x1 
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        
+    def get_data(self):
+
+        client = Client('http://coastmap.com/eds20/eds.asmx?WSDL')
+        
+        result = client.service.GetData(
+            Key='rpstest',
+            SourceID=696,
+            SourceName='Hycom_Global',
+            OutputType=1,
+            StartDate=self.start.strftime("%Y-%m-%dT%H:%M:%S"),
+            EndDate=self.end.strftime("%Y-%m-%dT%H:%M:%S"),
+            X1=self.x1,
+            Y1=self.y1,
+            X2=self.x2,
+            Y2=self.y2,
+            Zipped=False
+        )
+
+        while client.service.GetStatus(result) != 'COMPLETE ':
+            if client.service.GetStatus(result) == 'COMPLETE ':
+                print("Status: 'COMPLETE '")
+                url = f'https://coastmap.com/edsoutput/{result}'
+                print(f'URL: {url}')
+                return url
+
+    
 def parcels_to_geojson(lat, lon, t0='2010_0420'):
 
     data = '/data/*'
-    files = os.listdir('/data')
-    fname = 'parcels_out'
+    files = os.listdir('/data') # todo: nix this
+    fname = 'parcels_out.nc'
 
     # Hydrodynamics
     # TODO: make input t0 an actual option
@@ -33,13 +71,14 @@ def parcels_to_geojson(lat, lon, t0='2010_0420'):
     # Execute run and save results to output file
     pset.execute(
         AdvectionRK4,
-        runtime=timedelta(days=len(files)),
+        runtime=timedelta(days=len(files)), # todo: replace this with some other way 
         dt=timedelta(minutes=60),
-        output_file=pset.ParticleFile(name=fname+'.nc', outputdt=timedelta(hours=24)) # https://github.com/OceanParcels/parcels/issues/704#issuecomment-567840058
+        # https://github.com/OceanParcels/parcels/issues/704#issuecomment-567840058
+        output_file=pset.ParticleFile(name=fname, outputdt=timedelta(hours=24))
     )
 
     # Load into xarray, then dataframe
-    ds = xr.load_dataset(fname+'.nc')
+    ds = xr.load_dataset(fname)
     df = ds.to_dataframe().reset_index(drop=True)
 
     # Geojson features
