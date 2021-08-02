@@ -5,6 +5,7 @@ import datetime
 import fastapi
 import logging
 import os
+import glob
 import starlette.responses
 from starlette.middleware.cors import CORSMiddleware
 
@@ -31,8 +32,14 @@ logger = logging.getLogger('server')
 
 # endpoints
 @app.get("/trajectory")
-async def trajectory(lat: float, lon: float, t0: datetime.datetime):
-    content = parcels_to_geojson(lat, lon, t0)
+async def trajectory(lat: float, lon: float, t0: str, dataset: str):#datetime.datetime
+    # remove data files (if any preexist)
+    data = '/data/*'
+    files = glob.glob(data)
+    for f in files:
+        os.remove(f)
+        
+    content = parcels_to_geojson(lat, lon, t0, dataset)#='HYCOM GLOBAL NAVY'
     return starlette.responses.JSONResponse(content=content)
 
 

@@ -19,3 +19,15 @@ If that all works you should be able to enter this url (for example) and get the
 ```
 http://0.0.0.0:5000/trajectory?lat=28.7&lon=-88.3&t0=0
 ```
+http://localhost:5000/trajectory?lat=28.7&lon=-88.3&t0=0
+
+
+docker build -t eds-base .
+docker run --publish 5000:5000 -it --rm eds-base /bin/bash
+
+http://localhost:5000/trajectory?lat=28.7&lon=-88.3&t0=2021-01-12
+
+http://localhost:5000/trajectory?lat=26.53729&lon=-90.37788&t0=2021-01-10
+
+http://localhost:5000/trajectory?lat=28.7&lon=-88.3&t0=2021-01-12&dataset=HYCOM%20GLOBAL%20NAVY
+http://localhost:5000/trajectory?lat=28.7&lon=-88.3&t0=2021-01-12&dataset=COPERNICUS%20GLOBAL

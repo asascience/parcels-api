@@ -3,10 +3,12 @@
 import os
 import json
 from datetime import datetime, timedelta
-
+import glob
 import numpy as np
 import xarray as xr
 from zeep import Client
+from requestEDSdata import EDSrequestData
+import netCDF4 as nc
 
 from parcels import FieldSet, ParticleSet, JITParticle, AdvectionRK4
 
@@ -47,17 +49,62 @@ class EDS:
                 return url
 
     
-def parcels_to_geojson(lat, lon, t0='2010_0420'):
-
+def parcels_to_geojson(lat, lon, t0=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'), dataset='HYCOM GLOBAL NAVY'): #'2010_0420'='HYCOM GLOBAL NAVY'
+    
+    # Download new files
+    EDSrequestData(lat, lon, t0=t0, dataset=dataset)
     data = '/data/*'
     files = os.listdir('/data') # todo: nix this
     fname = 'parcels_out.nc'
+    
+    ds = nc.Dataset('/data/' + files[0])
+    names = list(ds.variables.keys())
+
+    # determine longitude and latitude variable names    
+    if any(x == 'lon' for x in names):
+        varlon = 'lon'
+        varlat = 'lat'
+    elif any(x == 'longitude' for x in names):
+        varlon = 'longitude'
+        varlat = 'latitude'
+    else:
+        varlon = 'Longitude'
+        varlat = 'Latitude'
+        
+    # determine u and v variable names    
+    if any(x == 'water_u' for x in names):
+        varu = 'water_u'
+        varv = 'water_v'
+    elif any(x == 'uo' for x in names):
+        varu = 'uo'
+        varv = 'vo'
+    else:
+        varu = 'u'
+        varv = 'v'
+        
+    # determine time variable name    
+    if any(x == 'time' for x in names):
+        vartime = 'time'
+    else:
+        vartime = 'MT'  
+        
+    # covert site location from -180 to 180 TO 0 to 360 (if dataset in 0-360)
+    if any(ds[varlon][:] > 180): 
+        if lon < 0:
+            lon=360+lon
+            
+    if any(ds[varlat][:] > 180):
+        if lat < 0:
+            lat=360+lat    
 
     # Hydrodynamics
     # TODO: make input t0 an actual option
+#    filenames = {'U': data, 'V': data}
+#    variables = {'U': 'u', 'V': 'v'}
+#    dimensions = {'lat': 'latitude', 'lon': 'longitude', 'time': 'time'}
     filenames = {'U': data, 'V': data}
-    variables = {'U': 'u', 'V': 'v'}
-    dimensions = {'lat': 'latitude', 'lon': 'longitude', 'time': 'time'}
+    variables = {'U': varu, 'V': varv}
+    dimensions = {'lat': varlat, 'lon': varlon, 'time': vartime}
     fset = FieldSet.from_netcdf(filenames, variables, dimensions, allow_time_extrapolation=True)
 
     # Particles
@@ -80,7 +127,11 @@ def parcels_to_geojson(lat, lon, t0='2010_0420'):
     # Load into xarray, then dataframe
     ds = xr.load_dataset(fname)
     df = ds.to_dataframe().reset_index(drop=True)
-
+    
+    # covert 0 to 360 TO -180 to 180
+    df['lon'] = df.apply(lambda x: x.lon-360 if x.lon > 180 else x.lon, axis=1)
+    df['lat'] = df.apply(lambda x: x.lat-360 if x.lat > 180 else x.lat, axis=1)
+            
     # Geojson features
     features = []
     for val in df['trajectory'].unique():

@@ -56,6 +56,7 @@ ENV PARCELS_PATH /srv/parcels
 RUN mkdir -p "$PARCELS_PATH"
 COPY server.py /srv/parcels
 COPY util.py /srv/parcels
+COPY requestEDSdata.py /srv/parcels
 WORKDIR /srv/parcels
 
 # forcing data mount
@@ -63,6 +64,6 @@ VOLUME /data
 
 EXPOSE 5000
 
-COPY data/HYCOM* /data/
+#COPY data/HYCOM* /data/
 
 CMD python3.7 server.py
