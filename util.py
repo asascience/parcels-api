@@ -49,10 +49,11 @@ class EDS:
                 return url
 
     
-def parcels_to_geojson(lat, lon, t0=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'), dataset='HYCOM GLOBAL NAVY'): #'2010_0420'='HYCOM GLOBAL NAVY'
+def parcels_to_geojson(lat, lon, t0=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'), 
+                        t=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'), dataset='HYCOM GLOBAL NAVY'): #'2010_0420'='HYCOM GLOBAL NAVY'
     
     # Download new files
-    EDSrequestData(lat, lon, t0=t0, dataset=dataset)
+    EDSrequestData(lat, lon, t0=t0,t=t, dataset=dataset)
     data = '/data/*'
     files = os.listdir('/data') # todo: nix this
     fname = 'parcels_out.nc'

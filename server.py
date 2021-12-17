@@ -32,14 +32,14 @@ logger = logging.getLogger('server')
 
 # endpoints
 @app.get("/trajectory")
-async def trajectory(lat: float, lon: float, t0: str, dataset: str):#datetime.datetime
+async def trajectory(lat: float, lon: float, t0: str, t:str, dataset: str):#datetime.datetime
     # remove data files (if any preexist)
     data = '/data/*'
     files = glob.glob(data)
     for f in files:
         os.remove(f)
         
-    content = parcels_to_geojson(lat, lon, t0, dataset)#='HYCOM GLOBAL NAVY'
+    content = parcels_to_geojson(lat, lon, t0, t, dataset)#='HYCOM GLOBAL NAVY'
     return starlette.responses.JSONResponse(content=content)
 
 

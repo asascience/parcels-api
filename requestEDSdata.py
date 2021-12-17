@@ -11,6 +11,7 @@ import numpy as np
     
 def EDSrequestData(lat, lon, 
                    t0=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'), 
+                   t=(datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d'),
                    dataset='HYCOM GLOBAL NAVY'):#='HYCOM GLOBAL NAVY'
     # model=dataset.replace(' ', '_')
     
@@ -47,8 +48,10 @@ def EDSrequestData(lat, lon,
     
     date=t0    
     dateObj = datetime.strptime(date, '%Y-%m-%d')
-    
-    requestedDays = np.arange(7)
+    dateObjEnd = datetime.strptime(t, '%Y-%m-%d')
+    dayDelta = dateObjEnd - dateObj 
+
+    requestedDays = np.arange(dayDelta.days)
     
     for downloadDay in requestedDays:
         end_date = dateObj + timedelta(days=downloadDay.item())
@@ -66,6 +69,10 @@ def EDSrequestData(lat, lon,
         elif dataset=='CODAR STPS':
             end_date = end_date - timedelta(days=1) # 00:00 of the day is in the previous dates nc file
             filedate = end_date.strftime("%Y%m%d")
+        elif 'HFRADAR' in dataset and dataset!='HFRADAR USWC':
+            #stringdate = (end_date+timedelta(days=1)).strftime("%Y-%m-%d")
+            end_date = end_date - timedelta(days=1)
+            filedate = end_date.strftime("%Y%m%d") 
         else:
             filedate = end_date.strftime("%Y%m%d") 
         
@@ -96,7 +103,6 @@ def EDSrequestData(lat, lon,
                        stringdate+'T00%3A00%3A00Z&time_end='+stringdate+
                        'T00%3A00%3A00Z&timeStride=1&addLatLon=true&accept=netcdf')
                 rthredds = requests.get(dataurl)
-                
                 # THROW ERROR if no formats match
                 if rthredds.status_code < 200 or rthredds.status_code > 229:
                     raise Exception("Model " + model + " cannot be requested")
